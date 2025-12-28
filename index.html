@@ -4,6 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Lista Capodanno</title>
+
     <style>
         body {
             font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
@@ -13,6 +14,7 @@
 
         h1 { margin-bottom: 6px; }
         .muted { color: #666; margin-top: 0; }
+        .tiny { font-size: 12px; color: #666; }
 
         form {
             display: flex;
@@ -34,20 +36,37 @@
             cursor: pointer;
         }
 
-        /* Wrapper per rendere la tabella usabile su mobile */
+        /* ===== TABella scrollabile ===== */
+
         .tableWrap {
+            position: relative;
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
             border: 1px solid #eee;
             border-radius: 12px;
-            margin-top: 18px;
+            margin-top: 10px;
+        }
+
+        /* Ombra a destra per suggerire scroll */
+        .tableWrap::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 28px;
+            height: 100%;
+            pointer-events: none;
+            background: linear-gradient(
+                    to left,
+                    rgba(255,255,255,0.9),
+                    rgba(255,255,255,0)
+            );
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            margin: 0;
-            min-width: 720px; /* evita collasso su schermi piccoli */
+            min-width: 720px;
         }
 
         th, td {
@@ -58,15 +77,37 @@
             white-space: nowrap;
         }
 
-        /* Solo "Cosa" puo andare a capo */
+        /* Solo la colonna "Cosa" va a capo */
         td:first-child { white-space: normal; }
 
         td.actions { white-space: nowrap; }
 
-        .tiny { font-size: 12px; color: #666; }
-        .cellEdit { width: 180px; }
+        .cellEdit {
+            width: 180px;
+        }
 
-        /* toast */
+        /* ===== Scrollbar visibile ===== */
+
+        .tableWrap::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .tableWrap::-webkit-scrollbar-track {
+            background: #f0f0f0;
+            border-radius: 6px;
+        }
+
+        .tableWrap::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 6px;
+        }
+
+        .tableWrap::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+
+        /* ===== Toast ===== */
+
         #toast {
             display: none;
             position: sticky;
@@ -79,10 +120,10 @@
             z-index: 10;
         }
 
-        /* Mobile */
+        /* ===== Mobile ===== */
+
         @media (max-width: 640px) {
             body { margin: 14px; }
-
             h1 { font-size: 22px; }
 
             form {
@@ -104,15 +145,22 @@
         }
     </style>
 </head>
+
 <body>
 <h1>Lista per Capodanno</h1>
 
 <div id="toast"></div>
 
 <p class="muted">
-    Eccovi la lista aggiornata in tempo reale di cosa ci servirà. I quantitativi sono approssimativi :)
-    Per favore inserite il nome e quanto e salvate.
+    Eccovi la lista aggiornata in tempo reale di cosa ci servirà.
+    I quantitativi sono approssimativi 🙂
+    Per favore inserite il nome, quanto portate e salvate.
 </p>
+
+<input id="partyCode" placeholder="Codice lista" style="width:100%; max-width:360px;" />
+<p class="tiny">Inserisci il codice una volta.</p>
+
+<p class="tiny">← scorri orizzontalmente per vedere tutti i campi →</p>
 
 <div class="tableWrap">
     <table>
@@ -130,7 +178,9 @@
 </div>
 
 <h3>Sommario</h3>
-<div id="summary" class="muted">Nessuno ha ancora dichiarato nulla. Classico.</div>
+<div id="summary" class="muted">
+    Nessuno ha ancora dichiarato nulla. Classico.
+</div>
 
 <h3>Aggiungi una riga</h3>
 <form id="addForm">

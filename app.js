@@ -15,12 +15,27 @@ const addQuanto = $("addQuanto");
 const addChi = $("addChi");
 const addQuantoPorta = $("addQuantoPorta");
 
+const partyCodeEl = document.getElementById("partyCode");
+const savedCode = localStorage.getItem("partyCode") || "";
+if (partyCodeEl) partyCodeEl.value = savedCode;
+
+function getPartyCode() {
+    const code = (partyCodeEl?.value || "").trim();
+    if (code) localStorage.setItem("partyCode", code);
+    return code;
+}
+
 const toastEl = $("toast");
 let toastTimer = null;
 
 const params = new URLSearchParams(location.search);
-const presetName = params.get("name") || "";
-if (presetName && addChi) addChi.value = presetName;
+// Codice via URL: ?code=...
+const urlCode = params.get("code") || "";
+if (urlCode) localStorage.setItem("partyCode", urlCode);
+
+function getPartyCode() {
+    return (localStorage.getItem("partyCode") || "").trim();
+}
 
 function escapeHtml(s) {
     return String(s ?? "")
@@ -146,10 +161,23 @@ async function saveRow(id) {
         return;
     }
 
+    const code = getPartyCode();
+    if (!code) {
+        showToast("Inserisci il codice lista", "error");
+        return;
+    }
+
+    const code = getPartyCode();
+    if (!code) {
+        showToast("Non hai il link con il codice", "error");
+        return;
+    }
+
     const { error } = await supabase
         .from("items")
-        .update({ chi_porta: chi, quanto_porta: qp })
+        .update({ chi_porta: chi, quanto_porta: qp, access_code: code })
         .eq("id", id);
+
 
     if (error) {
         showToast("Errore nel salvataggio", "error");
@@ -179,12 +207,26 @@ addForm?.addEventListener("submit", async (e) => {
         return;
     }
 
+    const code = getPartyCode();
+    if (!code) {
+        showToast("Inserisci il codice lista", "error");
+        return;
+    }
+
+    const code = getPartyCode();
+    if (!code) {
+        showToast("Non hai il link con il codice", "error");
+        return;
+    }
+
     const { error } = await supabase.from("items").insert({
         cosa,
         quanto_richiesto,
         chi_porta: chi_porta || null,
         quanto_porta: quanto_porta || null,
+        access_code: code
     });
+
 
     if (error) {
         showToast("Errore nell’aggiunta riga", "error");
@@ -208,10 +250,23 @@ document.addEventListener("click", async (e) => {
         const ok = confirm("Vuoi annullare? La voce torna libera.");
         if (!ok) return;
 
+        const code = getPartyCode();
+        if (!code) {
+            showToast("Inserisci il codice lista", "error");
+            return;
+        }
+
+        const code = getPartyCode();
+        if (!code) {
+            showToast("Non hai il link con il codice", "error");
+            return;
+        }
+
         const { error } = await supabase
             .from("items")
-            .update({ chi_porta: null, quanto_porta: null })
+            .update({ chi_porta: null, quanto_porta: null, access_code: code })
             .eq("id", id);
+
 
         if (error) {
             showToast("Errore durante l’annullamento", "error");
