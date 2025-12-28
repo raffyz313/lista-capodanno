@@ -36,8 +36,6 @@
             cursor: pointer;
         }
 
-        /* ===== TABella scrollabile ===== */
-
         .tableWrap {
             position: relative;
             overflow-x: auto;
@@ -47,7 +45,6 @@
             margin-top: 10px;
         }
 
-        /* Ombra a destra per suggerire scroll */
         .tableWrap::after {
             content: "";
             position: absolute;
@@ -77,36 +74,21 @@
             white-space: nowrap;
         }
 
-        /* Solo la colonna "Cosa" va a capo */
         td:first-child { white-space: normal; }
-
         td.actions { white-space: nowrap; }
 
-        .cellEdit {
-            width: 180px;
-        }
+        .cellEdit { width: 180px; }
 
-        /* ===== Scrollbar visibile ===== */
-
-        .tableWrap::-webkit-scrollbar {
-            height: 8px;
-        }
-
+        .tableWrap::-webkit-scrollbar { height: 8px; }
         .tableWrap::-webkit-scrollbar-track {
             background: #f0f0f0;
             border-radius: 6px;
         }
-
         .tableWrap::-webkit-scrollbar-thumb {
             background: #c1c1c1;
             border-radius: 6px;
         }
-
-        .tableWrap::-webkit-scrollbar-thumb:hover {
-            background: #a8a8a8;
-        }
-
-        /* ===== Toast ===== */
+        .tableWrap::-webkit-scrollbar-thumb:hover { background: #a8a8a8; }
 
         #toast {
             display: none;
@@ -119,8 +101,6 @@
             box-shadow: 0 4px 18px rgba(0,0,0,0.06);
             z-index: 10;
         }
-
-        /* ===== Mobile ===== */
 
         @media (max-width: 640px) {
             body { margin: 14px; }
@@ -157,9 +137,7 @@
     Per favore inserite il nome, quanto portate e salvate.
 </p>
 
-<input id="partyCode" placeholder="Codice lista" style="width:100%; max-width:360px;" />
-<p class="tiny">Inserisci il codice una volta.</p>
-
+<p class="tiny">Se non riesci a salvare, ti manca il link con il codice.</p>
 <p class="tiny">← scorri orizzontalmente per vedere tutti i campi →</p>
 
 <div class="tableWrap">
@@ -178,9 +156,7 @@
 </div>
 
 <h3>Sommario</h3>
-<div id="summary" class="muted">
-    Nessuno ha ancora dichiarato nulla. Classico.
-</div>
+<div id="summary" class="muted">Nessuno ha ancora dichiarato nulla. Classico.</div>
 
 <h3>Aggiungi una riga</h3>
 <form id="addForm">

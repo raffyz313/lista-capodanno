@@ -15,22 +15,13 @@ const addQuanto = $("addQuanto");
 const addChi = $("addChi");
 const addQuantoPorta = $("addQuantoPorta");
 
-const partyCodeEl = document.getElementById("partyCode");
-const savedCode = localStorage.getItem("partyCode") || "";
-if (partyCodeEl) partyCodeEl.value = savedCode;
-
-function getPartyCode() {
-    const code = (partyCodeEl?.value || "").trim();
-    if (code) localStorage.setItem("partyCode", code);
-    return code;
-}
-
 const toastEl = $("toast");
 let toastTimer = null;
 
 const params = new URLSearchParams(location.search);
-// Codice via URL: ?code=...
-const urlCode = params.get("code") || "";
+
+// Codice invisibile via URL: ?code=...
+const urlCode = (params.get("code") || "").trim();
 if (urlCode) localStorage.setItem("partyCode", urlCode);
 
 function getPartyCode() {
@@ -87,50 +78,45 @@ function renderSummary(rows) {
         </tr>
       </thead>
       <tbody>
-        ${claimed
-        .map(
-            (r) => `
+        ${claimed.map((r) => `
           <tr>
             <td>${escapeHtml(r.chi_porta)}</td>
             <td>${escapeHtml(r.cosa)}</td>
             <td>${escapeHtml(r.quanto_porta)}</td>
             <td><button data-unclaim="${r.id}">Annulla</button></td>
           </tr>
-        `
-        )
-        .join("")}
+        `).join("")}
       </tbody>
     </table>
   `;
 }
 
 async function loadItems() {
+    // LEGGI dalla view pubblica (items_public), non dalla tabella base.
     const { data, error } = await supabase
-        .from("items")
+        .from("items_public")
         .select("*")
         .order("created_at", { ascending: true });
 
     if (error) {
-        listEl.innerHTML = `<tr><td colspan="4">Errore: ${escapeHtml(error.message)}</td></tr>`;
+        listEl.innerHTML = `<tr><td colspan="5">Errore: ${escapeHtml(error.message)}</td></tr>`;
         showToast("Errore nel caricamento dati", "error");
         return;
     }
 
     if (!data?.length) {
-        listEl.innerHTML = `<tr><td colspan="4">Lista vuota. Situazione sospetta.</td></tr>`;
+        listEl.innerHTML = `<tr><td colspan="5">Lista vuota. Situazione sospetta.</td></tr>`;
         summaryEl.innerHTML = "Nessuno ha ancora dichiarato nulla.";
         return;
     }
 
-    // Tabella sempre pronta con campi vuoti
-    listEl.innerHTML = data
-        .map(
-            (row) => `
+    // Tabella sempre pronta con campi vuoti (non mostra i valori salvati)
+    listEl.innerHTML = data.map((row) => `
     <tr data-row="${row.id}">
       <td>${escapeHtml(row.cosa)}</td>
       <td>${escapeHtml(row.quanto_richiesto)}</td>
       <td>
-        <input class="cellEdit" data-field="chi_porta" value="${escapeHtml(presetName)}" placeholder="Nome" />
+        <input class="cellEdit" data-field="chi_porta" value="" placeholder="Nome" />
       </td>
       <td>
         <input class="cellEdit" data-field="quanto_porta" value="" placeholder="Es. 2 bottiglie" />
@@ -139,9 +125,7 @@ async function loadItems() {
         <button data-save="${row.id}">Salva</button>
       </td>
     </tr>
-  `
-        )
-        .join("");
+  `).join("");
 
     renderSummary(data);
 }
@@ -163,21 +147,15 @@ async function saveRow(id) {
 
     const code = getPartyCode();
     if (!code) {
-        showToast("Inserisci il codice lista", "error");
-        return;
-    }
-
-    const code = getPartyCode();
-    if (!code) {
         showToast("Non hai il link con il codice", "error");
         return;
     }
 
+    // SCRIVI sulla tabella base (items) includendo access_code
     const { error } = await supabase
         .from("items")
         .update({ chi_porta: chi, quanto_porta: qp, access_code: code })
         .eq("id", id);
-
 
     if (error) {
         showToast("Errore nel salvataggio", "error");
@@ -186,11 +164,10 @@ async function saveRow(id) {
 
     showToast("Salvataggio riuscito", "success");
 
-    // Reset allo stato di default nella tabella
-    chiInput.value = presetName;   // se lo vuoi vuoto: cambia in ""
+    // Reset campi input
+    chiInput.value = "";
     qpInput.value = "";
 
-    // Aggiorna sommario da DB
     await loadItems();
 }
 
@@ -209,12 +186,6 @@ addForm?.addEventListener("submit", async (e) => {
 
     const code = getPartyCode();
     if (!code) {
-        showToast("Inserisci il codice lista", "error");
-        return;
-    }
-
-    const code = getPartyCode();
-    if (!code) {
         showToast("Non hai il link con il codice", "error");
         return;
     }
@@ -227,7 +198,6 @@ addForm?.addEventListener("submit", async (e) => {
         access_code: code
     });
 
-
     if (error) {
         showToast("Errore nell’aggiunta riga", "error");
         return;
@@ -238,7 +208,6 @@ addForm?.addEventListener("submit", async (e) => {
     addCosa.value = "";
     addQuanto.value = "";
     addQuantoPorta.value = "";
-    // lascia addChi com’è, cosi non lo riscrivi ogni volta
     await loadItems();
 });
 
@@ -252,12 +221,6 @@ document.addEventListener("click", async (e) => {
 
         const code = getPartyCode();
         if (!code) {
-            showToast("Inserisci il codice lista", "error");
-            return;
-        }
-
-        const code = getPartyCode();
-        if (!code) {
             showToast("Non hai il link con il codice", "error");
             return;
         }
@@ -266,7 +229,6 @@ document.addEventListener("click", async (e) => {
             .from("items")
             .update({ chi_porta: null, quanto_porta: null, access_code: code })
             .eq("id", id);
-
 
         if (error) {
             showToast("Errore durante l’annullamento", "error");
@@ -303,5 +265,4 @@ supabase
     .subscribe();
 
 setInterval(() => loadItems(), 15000);
-
 loadItems();
