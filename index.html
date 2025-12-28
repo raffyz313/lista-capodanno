@@ -1,162 +1,146 @@
 <!doctype html>
 <html lang="it">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Lista Capodanno</title>
-  <style>
-    body {
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-      margin: 24px;
-      max-width: 900px;
-    }
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Lista Capodanno</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+            margin: 24px;
+            max-width: 900px;
+        }
 
-    h1 { margin-bottom: 6px; }
-    .muted { color: #666; margin-top: 0; }
+        h1 { margin-bottom: 6px; }
+        .muted { color: #666; margin-top: 0; }
 
-    form {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      align-items: center;
-      margin-top: 14px;
-    }
+        form {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+            margin-top: 14px;
+        }
 
-    input {
-      padding: 10px;
-      font-size: 16px;
-      box-sizing: border-box;
-    }
+        input {
+            padding: 10px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
 
-    button {
-      padding: 10px 14px;
-      font-size: 16px;
-      cursor: pointer;
-    }
+        button {
+            padding: 10px 14px;
+            font-size: 16px;
+            cursor: pointer;
+        }
 
-    /* Wrapper per rendere la tabella usabile su mobile */
-    .tableWrap {
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
-      border: 1px solid #eee;
-      border-radius: 12px;
-      margin-top: 18px;
-    }
-    
-    .tableWrap {
-  position: relative;
-}
+        /* Wrapper per rendere la tabella usabile su mobile */
+        .tableWrap {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            border: 1px solid #eee;
+            border-radius: 12px;
+            margin-top: 18px;
+        }
 
-.tableWrap::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 28px;
-  height: 100%;
-  pointer-events: none;
-  background: linear-gradient(to left, rgba(255,255,255,0.9), rgba(255,255,255,0));
-}
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0;
+            min-width: 720px; /* evita collasso su schermi piccoli */
+        }
 
+        th, td {
+            border-bottom: 1px solid #eee;
+            padding: 10px;
+            text-align: left;
+            vertical-align: top;
+            white-space: nowrap;
+        }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin: 0;
-      min-width: 720px; /* evita collasso su schermi piccoli */
-    }
+        /* Solo "Cosa" puo andare a capo */
+        td:first-child { white-space: normal; }
 
-    th, td {
-      border-bottom: 1px solid #eee;
-      padding: 10px;
-      text-align: left;
-      vertical-align: top;
-      white-space: nowrap;
-    }
+        td.actions { white-space: nowrap; }
 
-    /* Solo "Cosa" puo andare a capo */
-    td:first-child { white-space: normal; }
+        .tiny { font-size: 12px; color: #666; }
+        .cellEdit { width: 180px; }
 
-    td.actions { white-space: nowrap; }
+        /* toast */
+        #toast {
+            display: none;
+            position: sticky;
+            top: 12px;
+            padding: 10px 14px;
+            border-radius: 10px;
+            margin: 12px 0 16px 0;
+            font-weight: 500;
+            box-shadow: 0 4px 18px rgba(0,0,0,0.06);
+            z-index: 10;
+        }
 
-    .tiny { font-size: 12px; color: #666; }
-    .cellEdit { width: 180px; }
+        /* Mobile */
+        @media (max-width: 640px) {
+            body { margin: 14px; }
 
-    /* toast */
-    #toast {
-      display: none;
-      position: sticky;
-      top: 12px;
-      padding: 10px 14px;
-      border-radius: 10px;
-      margin: 12px 0 16px 0;
-      font-weight: 500;
-      box-shadow: 0 4px 18px rgba(0,0,0,0.06);
-      z-index: 10;
-    }
+            h1 { font-size: 22px; }
 
-    /* Mobile */
-    @media (max-width: 640px) {
-      body { margin: 14px; }
+            form {
+                display: grid;
+                gap: 10px;
+            }
 
-      h1 { font-size: 22px; }
+            form input,
+            form button {
+                width: 100%;
+            }
 
-      form {
-        display: grid;
-        gap: 10px;
-      }
+            .cellEdit {
+                width: 100%;
+                min-width: 140px;
+            }
 
-      form input,
-      form button {
-        width: 100%;
-      }
-
-      .cellEdit {
-        width: 100%;
-        min-width: 140px;
-      }
-
-      #toast { top: 8px; }
-    }
-  </style>
+            #toast { top: 8px; }
+        }
+    </style>
 </head>
 <body>
-  <h1>Lista per Capodanno</h1>
+<h1>Lista per Capodanno</h1>
 
-  <div id="toast"></div>
+<div id="toast"></div>
 
-  <p class="muted">
+<p class="muted">
     Eccovi la lista aggiornata in tempo reale di cosa ci servirà. I quantitativi sono approssimativi :)
     Per favore inserite il nome e quanto e salvate.
-  </p>
+</p>
 
-  <div class="tableWrap">
+<div class="tableWrap">
     <table>
-      <thead>
+        <thead>
         <tr>
-          <th>Cosa</th>
-          <th>Quanto</th>
-          <th>Chi porta</th>
-          <th>Quanto porta</th>
-          <th></th>
+            <th>Cosa</th>
+            <th>Quanto</th>
+            <th>Chi porta</th>
+            <th>Quanto porta</th>
+            <th></th>
         </tr>
-      </thead>
-      <tbody id="list"></tbody>
+        </thead>
+        <tbody id="list"></tbody>
     </table>
-  </div>
+</div>
 
-  <h3>Sommario</h3>
-  <div id="summary" class="muted">Nessuno ha ancora dichiarato nulla. Classico.</div>
+<h3>Sommario</h3>
+<div id="summary" class="muted">Nessuno ha ancora dichiarato nulla. Classico.</div>
 
-  <h3>Aggiungi una riga</h3>
-  <form id="addForm">
+<h3>Aggiungi una riga</h3>
+<form id="addForm">
     <input id="addCosa" placeholder="Cosa (es. Ghiaccio)" required />
     <input id="addQuanto" placeholder="Quanto richiesto (es. 2 kg / Opzionale)" required />
     <input id="addChi" placeholder="Chi porta (facoltativo)" />
     <input id="addQuantoPorta" placeholder="Quanto porta (facoltativo)" />
     <button type="submit">Aggiungi</button>
-  </form>
+</form>
 
-  <script type="module" src="./app.js"></script>
+<script type="module" src="./app.js"></script>
 </body>
 </html>
