@@ -42,6 +42,22 @@
       border-radius: 12px;
       margin-top: 18px;
     }
+    
+    .tableWrap {
+  position: relative;
+}
+
+.tableWrap::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 28px;
+  height: 100%;
+  pointer-events: none;
+  background: linear-gradient(to left, rgba(255,255,255,0.9), rgba(255,255,255,0));
+}
+
 
     table {
       width: 100%;
